@@ -1,6 +1,6 @@
 {
   "name": "react-query-filters-manager",
-  "version": "1.0.6",
+  "version": "1.0.11",
   "description": "react-query-filters-manager",
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
@@ -10,7 +10,7 @@
   "scripts": {
     "build": "rm -rf dist/ && prettier --write src/ && npm run build:esm && npm run build:cjs",
     "build:esm": "tsc",
-    "build:cjs": "tsc --module CommonJS --outDir dist/cjs",
+    "build:cjs": "tsc --module CommonJS --outDir  dist/cjs --allowSyntheticDefaultImports",
     "prettier:fix": "prettier --write \"./**/*.{js,jsx,ts,tsx,json,css,scss}\""
   },
   "repository": {
@@ -38,7 +38,6 @@
   "dependencies": {
     "@tanstack/react-query": "^4.22.3",
     "next": "^13.0.7",
-    "query-string": "^8.1.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   }

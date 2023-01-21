@@ -1,11 +1,13 @@
-import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
+import {type QueryClient, useMutation, useQuery} from '@tanstack/react-query';
 import type {UseMutationResult, UseQueryResult, UseQueryOptions} from '@tanstack/react-query/src/types';
 import {useRouter} from 'next/router';
-import {parseUrl, stringify} from 'query-string/base';
-import type {ParsedQuery, StringifyOptions} from 'query-string';
-import {useEffect, useMemo, useState} from 'react';
+import {useEffect, useState} from 'react';
+import type {ParsedUrlQuery} from 'querystring';
 
 type Props<TData, TFilters, TFiltersPrepared = TFilters, TVariants = void> = {
+  // Query client for work with data.
+  queryClient: QueryClient;
+
   // The key by which the data will be updated.
   filtersKey: string;
 
@@ -16,7 +18,7 @@ type Props<TData, TFilters, TFiltersPrepared = TFilters, TVariants = void> = {
   getData: (params: TFilters) => Promise<TData>;
 
   // Convert query params to filter object.
-  queryParser: (query: ParsedQuery) => TFilters;
+  queryParser: (query: ParsedUrlQuery) => TFilters;
 
   // Getting filters.
   getFiltersValues: () => Promise<TFilters | undefined>;
@@ -84,6 +86,7 @@ export type UseFiltersState<TData, TFilters, TVariants = void> = {
  * 5) When filters are changed, the method for obtaining data is called.
  */
 export const useFilters = <TData extends any, TFilters extends {}, TFiltersPrepared = TFilters, TVariants = void>({
+  queryClient,
   filtersKey,
   initialFilters,
   getVariants,
@@ -96,12 +99,7 @@ export const useFilters = <TData extends any, TFilters extends {}, TFiltersPrepa
   valuesOptions,
 }: Props<TData, TFilters, TFiltersPrepared, TVariants>): UseFiltersState<TData, TFilters, TVariants> => {
   const [appliedFiltersCount, setAppliedFiltersCount] = useState<number>(0);
-  const queryClient = useQueryClient();
   const router = useRouter();
-  const queryStringConfig: StringifyOptions = useMemo(
-    () => ({arrayFormat: 'bracket', skipNull: true, skipEmptyString: true}),
-    [],
-  );
 
   const variants = useQuery<TVariants | null, any>([filtersKey + 'variants'], async () => {
     return getVariants ? getVariants() : null;
@@ -113,9 +111,7 @@ export const useFilters = <TData extends any, TFilters extends {}, TFiltersPrepa
       initialData: () => {
         if (!router.isReady) return undefined;
 
-        const queries = parseUrl(router.asPath, queryStringConfig).query;
-
-        return Object.keys(queries).length ? queryParser(queries) : initialFilters;
+        return Object.keys(router.query).length ? queryParser(router.query) : initialFilters;
       },
       select: (data) => data ?? initialFilters,
     },
@@ -153,11 +149,11 @@ export const useFilters = <TData extends any, TFilters extends {}, TFiltersPrepa
     if (!router.isReady || !data) return;
 
     const transformedData = queryTransformer ? queryTransformer(data) : data;
-    const query = stringify(transformedData, queryStringConfig);
-    const {url} = parseUrl(router.asPath);
-    const replacedUrl = url + (query ? `?${query}` : '');
 
-    router.replace(replacedUrl, replacedUrl, {scroll: false});
+    router.replace({
+      pathname: router.pathname,
+      query: transformedData as any,
+    });
   };
 
   return {

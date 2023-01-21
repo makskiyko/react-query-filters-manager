@@ -1,10 +1,13 @@
+/// <reference types="node" />
+import { type QueryClient } from '@tanstack/react-query';
 import type { UseMutationResult, UseQueryResult, UseQueryOptions } from '@tanstack/react-query/src/types';
-import type { ParsedQuery } from 'query-string';
+import type { ParsedUrlQuery } from 'querystring';
 declare type Props<TData, TFilters, TFiltersPrepared = TFilters, TVariants = void> = {
+    queryClient: QueryClient;
     filtersKey: string;
     initialFilters: TFilters;
     getData: (params: TFilters) => Promise<TData>;
-    queryParser: (query: ParsedQuery) => TFilters;
+    queryParser: (query: ParsedUrlQuery) => TFilters;
     getFiltersValues: () => Promise<TFilters | undefined>;
     setFiltersValues: (data: TFilters) => Promise<TFilters>;
     queryTransformer?: (data: TFilters) => TFiltersPrepared;
@@ -43,5 +46,5 @@ export declare type UseFiltersState<TData, TFilters, TVariants = void> = {
  * 4) To reset the recovery data, `handleChange`, which repeats 2 step with the initial data.
  * 5) When filters are changed, the method for obtaining data is called.
  */
-export declare const useFilters: <TData extends unknown, TFilters extends {}, TFiltersPrepared = TFilters, TVariants = void>({ filtersKey, initialFilters, getVariants, getData, getAppliedFiltersCount, queryParser, queryTransformer, getFiltersValues, setFiltersValues, valuesOptions, }: Props<TData, TFilters, TFiltersPrepared, TVariants>) => UseFiltersState<TData, TFilters, TVariants>;
+export declare const useFilters: <TData extends unknown, TFilters extends {}, TFiltersPrepared = TFilters, TVariants = void>({ queryClient, filtersKey, initialFilters, getVariants, getData, getAppliedFiltersCount, queryParser, queryTransformer, getFiltersValues, setFiltersValues, valuesOptions, }: Props<TData, TFilters, TFiltersPrepared, TVariants>) => UseFiltersState<TData, TFilters, TVariants>;
 export {};

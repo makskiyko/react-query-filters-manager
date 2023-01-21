@@ -7,10 +7,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { useRouter } from 'next/router';
-import { parseUrl, stringify } from 'query-string/base';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 /**
  * Using for storing, updating data and saving filters in  URL.
  *
@@ -30,11 +29,9 @@ import { useEffect, useMemo, useState } from 'react';
  * 4) To reset the recovery data, `handleChange`, which repeats 2 step with the initial data.
  * 5) When filters are changed, the method for obtaining data is called.
  */
-export const useFilters = ({ filtersKey, initialFilters, getVariants, getData, getAppliedFiltersCount, queryParser, queryTransformer, getFiltersValues, setFiltersValues, valuesOptions, }) => {
+export const useFilters = ({ queryClient, filtersKey, initialFilters, getVariants, getData, getAppliedFiltersCount, queryParser, queryTransformer, getFiltersValues, setFiltersValues, valuesOptions, }) => {
     const [appliedFiltersCount, setAppliedFiltersCount] = useState(0);
-    const queryClient = useQueryClient();
     const router = useRouter();
-    const queryStringConfig = useMemo(() => ({ arrayFormat: 'bracket', skipNull: true, skipEmptyString: true }), []);
     const variants = useQuery([filtersKey + 'variants'], () => __awaiter(void 0, void 0, void 0, function* () {
         return getVariants ? getVariants() : null;
     }));
@@ -42,8 +39,7 @@ export const useFilters = ({ filtersKey, initialFilters, getVariants, getData, g
         initialData: () => {
             if (!router.isReady)
                 return undefined;
-            const queries = parseUrl(router.asPath, queryStringConfig).query;
-            return Object.keys(queries).length ? queryParser(queries) : initialFilters;
+            return Object.keys(router.query).length ? queryParser(router.query) : initialFilters;
         },
         select: (data) => data !== null && data !== void 0 ? data : initialFilters,
     });
@@ -70,10 +66,10 @@ export const useFilters = ({ filtersKey, initialFilters, getVariants, getData, g
         if (!router.isReady || !data)
             return;
         const transformedData = queryTransformer ? queryTransformer(data) : data;
-        const query = stringify(transformedData, queryStringConfig);
-        const { url } = parseUrl(router.asPath);
-        const replacedUrl = url + (query ? `?${query}` : '');
-        router.replace(replacedUrl, replacedUrl, { scroll: false });
+        router.replace({
+            pathname: router.pathname,
+            query: transformedData,
+        });
     };
     return {
         appliedFiltersCount,
