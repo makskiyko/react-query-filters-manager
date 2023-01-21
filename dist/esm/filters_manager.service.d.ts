@@ -1,5 +1,4 @@
-import type { UseMutationResult, UseQueryResult } from '@tanstack/react-query/src/types';
-import { UseQueryOptions } from '@tanstack/react-query/src/types';
+import type { UseMutationResult, UseQueryResult, UseQueryOptions } from '@tanstack/react-query/src/types';
 import type { ParsedQuery } from 'query-string';
 declare type Props<TData, TFilters, TFiltersPrepared = TFilters, TVariants = void> = {
     filtersKey: string;

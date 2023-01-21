@@ -8,14 +8,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.useFilters = void 0;
 const react_query_1 = require("@tanstack/react-query");
 const router_1 = require("next/router");
-const query_string_1 = __importDefault(require("query-string"));
+const base_1 = require("query-string/base");
 const react_1 = require("react");
 /**
  * Using for storing, updating data and saving filters in  URL.
@@ -48,7 +45,7 @@ const useFilters = ({ filtersKey, initialFilters, getVariants, getData, getAppli
         initialData: () => {
             if (!router.isReady)
                 return undefined;
-            const queries = query_string_1.default.parseUrl(router.asPath, queryStringConfig).query;
+            const queries = (0, base_1.parseUrl)(router.asPath, queryStringConfig).query;
             return Object.keys(queries).length ? queryParser(queries) : initialFilters;
         },
         select: (data) => data !== null && data !== void 0 ? data : initialFilters,
@@ -76,8 +73,8 @@ const useFilters = ({ filtersKey, initialFilters, getVariants, getData, getAppli
         if (!router.isReady || !data)
             return;
         const transformedData = queryTransformer ? queryTransformer(data) : data;
-        const query = query_string_1.default.stringify(transformedData, queryStringConfig);
-        const { url } = query_string_1.default.parseUrl(router.asPath);
+        const query = (0, base_1.stringify)(transformedData, queryStringConfig);
+        const { url } = (0, base_1.parseUrl)(router.asPath);
         const replacedUrl = url + (query ? `?${query}` : '');
         router.replace(replacedUrl, replacedUrl, { scroll: false });
     };

@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/router';
-import queryString from 'query-string';
+import { parseUrl, stringify } from 'query-string/base';
 import { useEffect, useMemo, useState } from 'react';
 /**
  * Using for storing, updating data and saving filters in  URL.
@@ -42,7 +42,7 @@ export const useFilters = ({ filtersKey, initialFilters, getVariants, getData, g
         initialData: () => {
             if (!router.isReady)
                 return undefined;
-            const queries = queryString.parseUrl(router.asPath, queryStringConfig).query;
+            const queries = parseUrl(router.asPath, queryStringConfig).query;
             return Object.keys(queries).length ? queryParser(queries) : initialFilters;
         },
         select: (data) => data !== null && data !== void 0 ? data : initialFilters,
@@ -70,8 +70,8 @@ export const useFilters = ({ filtersKey, initialFilters, getVariants, getData, g
         if (!router.isReady || !data)
             return;
         const transformedData = queryTransformer ? queryTransformer(data) : data;
-        const query = queryString.stringify(transformedData, queryStringConfig);
-        const { url } = queryString.parseUrl(router.asPath);
+        const query = stringify(transformedData, queryStringConfig);
+        const { url } = parseUrl(router.asPath);
         const replacedUrl = url + (query ? `?${query}` : '');
         router.replace(replacedUrl, replacedUrl, { scroll: false });
     };

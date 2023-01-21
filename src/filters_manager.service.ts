@@ -1,8 +1,7 @@
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
-import type {UseMutationResult, UseQueryResult} from '@tanstack/react-query/src/types';
-import {UseQueryOptions} from '@tanstack/react-query/src/types';
+import type {UseMutationResult, UseQueryResult, UseQueryOptions} from '@tanstack/react-query/src/types';
 import {useRouter} from 'next/router';
-import queryString from 'query-string';
+import {parseUrl, stringify} from 'query-string/base';
 import type {ParsedQuery, StringifyOptions} from 'query-string';
 import {useEffect, useMemo, useState} from 'react';
 
@@ -114,7 +113,7 @@ export const useFilters = <TData extends any, TFilters extends {}, TFiltersPrepa
       initialData: () => {
         if (!router.isReady) return undefined;
 
-        const queries = queryString.parseUrl(router.asPath, queryStringConfig).query;
+        const queries = parseUrl(router.asPath, queryStringConfig).query;
 
         return Object.keys(queries).length ? queryParser(queries) : initialFilters;
       },
@@ -154,8 +153,8 @@ export const useFilters = <TData extends any, TFilters extends {}, TFiltersPrepa
     if (!router.isReady || !data) return;
 
     const transformedData = queryTransformer ? queryTransformer(data) : data;
-    const query = queryString.stringify(transformedData, queryStringConfig);
-    const {url} = queryString.parseUrl(router.asPath);
+    const query = stringify(transformedData, queryStringConfig);
+    const {url} = parseUrl(router.asPath);
     const replacedUrl = url + (query ? `?${query}` : '');
 
     router.replace(replacedUrl, replacedUrl, {scroll: false});
