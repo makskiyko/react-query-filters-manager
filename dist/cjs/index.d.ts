@@ -1,1 +1,1 @@
-export * from './filters_manager.service';
+export * from './filters_manager';

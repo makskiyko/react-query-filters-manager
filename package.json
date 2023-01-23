@@ -1,6 +1,6 @@
 {
   "name": "react-query-filters-manager",
-  "version": "1.0.11",
+  "version": "1.0.0",
   "description": "react-query-filters-manager",
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",

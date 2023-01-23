@@ -8,11 +8,16 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.useFilters = void 0;
+exports.FiltersManagerContextProvider = exports.useFilters = void 0;
+const react_1 = require("react");
+const react_2 = __importDefault(require("react"));
 const react_query_1 = require("@tanstack/react-query");
 const router_1 = require("next/router");
-const react_1 = require("react");
+const FiltersManagerContext = (0, react_1.createContext)(null);
 /**
  * Using for storing, updating data and saving filters in  URL.
  *
@@ -32,7 +37,9 @@ const react_1 = require("react");
  * 4) To reset the recovery data, `handleChange`, which repeats 2 step with the initial data.
  * 5) When filters are changed, the method for obtaining data is called.
  */
-const useFilters = ({ queryClient, filtersKey, initialFilters, getVariants, getData, getAppliedFiltersCount, queryParser, queryTransformer, getFiltersValues, setFiltersValues, valuesOptions, }) => {
+const useFilters = ({ filtersKey, initialFilters, getVariants, getData, getAppliedFiltersCount, queryParser, queryTransformer, getFiltersValues, setFiltersValues, valuesOptions, }) => {
+    (0, react_1.useContext)(FiltersManagerContext);
+    const queryClient = (0, react_query_1.useQueryClient)();
     const [appliedFiltersCount, setAppliedFiltersCount] = (0, react_1.useState)(0);
     const router = (0, router_1.useRouter)();
     const variants = (0, react_query_1.useQuery)([filtersKey + 'variants'], () => __awaiter(void 0, void 0, void 0, function* () {
@@ -85,4 +92,10 @@ const useFilters = ({ queryClient, filtersKey, initialFilters, getVariants, getD
     };
 };
 exports.useFilters = useFilters;
-//# sourceMappingURL=filters_manager.service.js.map
+const FiltersManagerContextProvider = ({ queryClient, children }) => {
+    const client = (0, react_1.useMemo)(() => queryClient !== null && queryClient !== void 0 ? queryClient : new react_query_1.QueryClient(), [queryClient]);
+    return (react_2.default.createElement(FiltersManagerContext.Provider, { value: null },
+        react_2.default.createElement(react_query_1.QueryClientProvider, { client: client }, children)));
+};
+exports.FiltersManagerContextProvider = FiltersManagerContextProvider;
+//# sourceMappingURL=filters_manager.js.map

@@ -1,13 +1,12 @@
-import {type QueryClient, useMutation, useQuery} from '@tanstack/react-query';
-import type {UseMutationResult, UseQueryResult, UseQueryOptions} from '@tanstack/react-query/src/types';
+import {createContext, useContext, useEffect, useMemo, useState} from 'react';
+import React, {type PropsWithChildren} from 'react';
+
+import {UseMutationResult, UseQueryOptions, UseQueryResult} from '@tanstack/react-query/src/types';
+import {QueryClient, QueryClientProvider, useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import {useRouter} from 'next/router';
-import {useEffect, useState} from 'react';
-import type {ParsedUrlQuery} from 'querystring';
+import {ParsedUrlQuery} from 'querystring';
 
 type Props<TData, TFilters, TFiltersPrepared = TFilters, TVariants = void> = {
-  // Query client for work with data.
-  queryClient: QueryClient;
-
   // The key by which the data will be updated.
   filtersKey: string;
 
@@ -66,6 +65,8 @@ export type UseFiltersState<TData, TFilters, TVariants = void> = {
   resetFilters: UseMutationResult<TFilters, any, void | ResetFilterCallback<TFilters>>;
 };
 
+const FiltersManagerContext = createContext<null>(null);
+
 /**
  * Using for storing, updating data and saving filters in  URL.
  *
@@ -86,7 +87,6 @@ export type UseFiltersState<TData, TFilters, TVariants = void> = {
  * 5) When filters are changed, the method for obtaining data is called.
  */
 export const useFilters = <TData extends any, TFilters extends {}, TFiltersPrepared = TFilters, TVariants = void>({
-  queryClient,
   filtersKey,
   initialFilters,
   getVariants,
@@ -98,6 +98,8 @@ export const useFilters = <TData extends any, TFilters extends {}, TFiltersPrepa
   setFiltersValues,
   valuesOptions,
 }: Props<TData, TFilters, TFiltersPrepared, TVariants>): UseFiltersState<TData, TFilters, TVariants> => {
+  useContext(FiltersManagerContext);
+  const queryClient = useQueryClient();
   const [appliedFiltersCount, setAppliedFiltersCount] = useState<number>(0);
   const router = useRouter();
 
@@ -165,4 +167,18 @@ export const useFilters = <TData extends any, TFilters extends {}, TFiltersPrepa
     setFilters,
     resetFilters,
   };
+};
+
+type FiltersManagerContextProviderProps = PropsWithChildren<{
+  queryClient?: QueryClient;
+}>;
+
+export const FiltersManagerContextProvider = ({queryClient, children}: FiltersManagerContextProviderProps) => {
+  const client = useMemo<QueryClient>(() => queryClient ?? new QueryClient(), [queryClient]);
+
+  return (
+    <FiltersManagerContext.Provider value={null}>
+      <QueryClientProvider client={client}>{children}</QueryClientProvider>
+    </FiltersManagerContext.Provider>
+  );
 };
