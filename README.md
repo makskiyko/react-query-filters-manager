@@ -30,16 +30,47 @@ npm i react-query-filters-manager
 
 ## Usage
 Here is a very basic example of how to use Next Router Guards.
-1. Create you hook that return `UseFiltersState`.
-2. Call `useFilters` and pass generic parameters:
+1. Wrap your project into `FiltersManagerContextProvider` in _app.tsx.
+2. Create you hook that return `UseFiltersState`.
+3. Call `useFilters` and pass generic parameters:
     - `TData` - type of the management data (required);
     - `TFilters` - type of filters that affect on your data (required);
     - `TFiltersPrepared` - type of data that will be caching in url of page;
     - `TVariants` - type of variants your filter's data.
-3. Pass needed params to `useFilters`.
+4. Pass needed params to `useFilters`.
 
 Example:
+```tsx
+// /pages/_app.tsx
+
+import {FiltersManagerContextProvider} from 'react-query-filters-manager';
+
+function MyApp({pageProps}: AppProps) {
+  const queryClient = useMemo<QueryClient>(() => new QueryClient(), []);
+  
+  return (
+    <>
+      <Head>
+         ...
+      </Head>
+
+      <QueryClientProvider client={queryClient}>
+        <FiltersManagerContextProvider queryClient={queryClient}>
+          ...
+        </FiltersManagerContextProvider>
+      </QueryClientProvider>
+    </>
+  );
+}
+
+export default MyApp;
+```
+
 ```ts
+// cart_filters.service.ts
+
+import {useFilters, type UseFiltersState} from 'react-query-filters-manager';
+
 export const useCartFilters = (): UseFiltersState<CartModel, CartFiltersModel> => {
   const initialFilters = useMemo<CartFiltersModel>(
     () => ({
