@@ -153,7 +153,7 @@ export const useFilters = <TData extends any, TFilters extends {}, TFiltersPrepa
     const transformedData = queryTransformer ? queryTransformer(data) : data;
 
     router.replace({
-      pathname: router.pathname,
+      pathname: router.asPath.replace(/\?.+/, ''),
       query: transformedData as any,
     });
   };
