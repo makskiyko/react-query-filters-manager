@@ -71,7 +71,7 @@ export const useFilters = ({ filtersKey, initialFilters, getVariants, getData, g
             return;
         const transformedData = queryTransformer ? queryTransformer(data) : data;
         router.replace({
-            pathname: router.pathname,
+            pathname: router.asPath.replace(/\?.+/, ''),
             query: transformedData,
         });
     };
