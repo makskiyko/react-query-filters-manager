@@ -1,10 +1,10 @@
 /// <reference types="node" />
-import { type PropsWithChildren } from 'react';
-import { UseMutationResult, UseQueryOptions, UseQueryResult } from '@tanstack/react-query/src/types';
+import React, { type PropsWithChildren } from 'react';
 import { QueryClient } from '@tanstack/react-query';
+import type { UseMutationResult, UseQueryOptions, UseQueryResult, QueryKey } from '@tanstack/react-query';
 import { ParsedUrlQuery } from 'querystring';
 declare type Props<TData, TFilters, TFiltersPrepared = TFilters, TVariants = void> = {
-    filtersKey: string;
+    filtersKey: QueryKey;
     initialFilters: TFilters;
     getData: (params: TFilters) => Promise<TData>;
     queryParser: (query: ParsedUrlQuery) => TFilters;
@@ -50,5 +50,5 @@ export declare const useFilters: <TData extends unknown, TFilters extends {}, TF
 declare type FiltersManagerContextProviderProps = PropsWithChildren<{
     queryClient?: QueryClient;
 }>;
-export declare const FiltersManagerContextProvider: ({ queryClient, children }: FiltersManagerContextProviderProps) => JSX.Element;
+export declare const FiltersManagerContextProvider: ({ queryClient, children }: FiltersManagerContextProviderProps) => React.JSX.Element;
 export {};

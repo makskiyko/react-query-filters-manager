@@ -1,14 +1,14 @@
 import {createContext, useContext, useEffect, useMemo, useState} from 'react';
 import React, {type PropsWithChildren} from 'react';
 
-import {UseMutationResult, UseQueryOptions, UseQueryResult} from '@tanstack/react-query/src/types';
 import {QueryClient, QueryClientProvider, useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
+import type {UseMutationResult, UseQueryOptions, UseQueryResult, QueryKey} from '@tanstack/react-query';
 import {useRouter} from 'next/router';
 import {ParsedUrlQuery} from 'querystring';
 
 type Props<TData, TFilters, TFiltersPrepared = TFilters, TVariants = void> = {
   // The key by which the data will be updated.
-  filtersKey: string;
+  filtersKey: QueryKey;
 
   // Initial state of filters.
   initialFilters: TFilters;
@@ -103,11 +103,11 @@ export const useFilters = <TData extends any, TFilters extends {}, TFiltersPrepa
   const [appliedFiltersCount, setAppliedFiltersCount] = useState<number>(0);
   const router = useRouter();
 
-  const variants = useQuery<TVariants | null, any>([filtersKey + 'variants'], async () => {
+  const variants = useQuery<TVariants | null, any>([...filtersKey, 'variants'], async () => {
     return getVariants ? getVariants() : null;
   });
   const filters = useQuery<TFilters, any>(
-    [filtersKey + 'filters', router.isReady, initialFilters],
+    [...filtersKey, 'filters', router.isReady, initialFilters],
     async () => (await getFiltersValues()) ?? initialFilters,
     {
       initialData: () => {
@@ -119,14 +119,14 @@ export const useFilters = <TData extends any, TFilters extends {}, TFiltersPrepa
     },
   );
   const values = useQuery<TData, any>(
-    [filtersKey, filters.data],
+    [...filtersKey, filters.data],
     () => getData(filters.data ?? initialFilters),
     valuesOptions,
   );
 
   const setFilters = useMutation<TFilters, any, TFilters>(setFiltersValues, {
     onSuccess: async (data) => {
-      await queryClient.invalidateQueries([filtersKey + 'filters']);
+      await queryClient.invalidateQueries([...filtersKey, 'filters']);
       handleSetFiltersInUrl(data);
     },
   });
@@ -135,7 +135,7 @@ export const useFilters = <TData extends any, TFilters extends {}, TFiltersPrepa
     (callback) => setFiltersValues(callback ? callback(initialFilters) : initialFilters),
     {
       onSuccess: async (data) => {
-        await queryClient.invalidateQueries([filtersKey + 'filters']);
+        await queryClient.invalidateQueries([...filtersKey, 'filters']);
         handleSetFiltersInUrl(data);
       },
     },

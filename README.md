@@ -99,7 +99,7 @@ export const useCartFilters = (): UseFiltersState<CartModel, CartFiltersModel> =
   );
 
   return useFilters<CartModel, CartFiltersModel>({
-    filtersKey: cartKey,
+    filtersKey: [cartKey],
     getData: getCartByFiltersApi,
     initialFilters,
     queryParser,
@@ -141,7 +141,7 @@ For use `useFilters` you need to pass parameters:
 ```ts
 type Props<TData, TFilters, TFiltersPrepared = TFilters, TVariants = void> = {
   // The key by which the data will be updated.
-  filtersKey: string;
+  filtersKey: QueryKey;
 
   // Initial state of filters.
   initialFilters: TFilters;

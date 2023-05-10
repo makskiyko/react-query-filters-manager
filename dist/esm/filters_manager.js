@@ -36,10 +36,10 @@ export const useFilters = ({ filtersKey, initialFilters, getVariants, getData, g
     const queryClient = useQueryClient();
     const [appliedFiltersCount, setAppliedFiltersCount] = useState(0);
     const router = useRouter();
-    const variants = useQuery([filtersKey + 'variants'], () => __awaiter(void 0, void 0, void 0, function* () {
+    const variants = useQuery([...filtersKey, 'variants'], () => __awaiter(void 0, void 0, void 0, function* () {
         return getVariants ? getVariants() : null;
     }));
-    const filters = useQuery([filtersKey + 'filters', router.isReady, initialFilters], () => __awaiter(void 0, void 0, void 0, function* () { var _a; return (_a = (yield getFiltersValues())) !== null && _a !== void 0 ? _a : initialFilters; }), {
+    const filters = useQuery([...filtersKey, 'filters', router.isReady, initialFilters], () => __awaiter(void 0, void 0, void 0, function* () { var _a; return (_a = (yield getFiltersValues())) !== null && _a !== void 0 ? _a : initialFilters; }), {
         initialData: () => {
             if (!router.isReady)
                 return undefined;
@@ -47,16 +47,16 @@ export const useFilters = ({ filtersKey, initialFilters, getVariants, getData, g
         },
         select: (data) => data !== null && data !== void 0 ? data : initialFilters,
     });
-    const values = useQuery([filtersKey, filters.data], () => { var _a; return getData((_a = filters.data) !== null && _a !== void 0 ? _a : initialFilters); }, valuesOptions);
+    const values = useQuery([...filtersKey, filters.data], () => { var _a; return getData((_a = filters.data) !== null && _a !== void 0 ? _a : initialFilters); }, valuesOptions);
     const setFilters = useMutation(setFiltersValues, {
         onSuccess: (data) => __awaiter(void 0, void 0, void 0, function* () {
-            yield queryClient.invalidateQueries([filtersKey + 'filters']);
+            yield queryClient.invalidateQueries([...filtersKey, 'filters']);
             handleSetFiltersInUrl(data);
         }),
     });
     const resetFilters = useMutation((callback) => setFiltersValues(callback ? callback(initialFilters) : initialFilters), {
         onSuccess: (data) => __awaiter(void 0, void 0, void 0, function* () {
-            yield queryClient.invalidateQueries([filtersKey + 'filters']);
+            yield queryClient.invalidateQueries([...filtersKey, 'filters']);
             handleSetFiltersInUrl(data);
         }),
     });
