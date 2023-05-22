@@ -2,6 +2,7 @@
 import React, { type PropsWithChildren } from 'react';
 import { QueryClient } from '@tanstack/react-query';
 import type { UseMutationResult, UseQueryOptions, UseQueryResult, QueryKey } from '@tanstack/react-query';
+import { NextRouter } from 'next/router';
 import { ParsedUrlQuery } from 'querystring';
 declare type Props<TData, TFilters, TFiltersPrepared = TFilters, TVariants = void> = {
     filtersKey: QueryKey;
@@ -49,6 +50,7 @@ export declare type UseFiltersState<TData, TFilters, TVariants = void> = {
 export declare const useFilters: <TData extends unknown, TFilters extends {}, TFiltersPrepared = TFilters, TVariants = void>({ filtersKey, initialFilters, getVariants, getData, getAppliedFiltersCount, queryParser, queryTransformer, getFiltersValues, setFiltersValues, valuesOptions, }: Props<TData, TFilters, TFiltersPrepared, TVariants>) => UseFiltersState<TData, TFilters, TVariants>;
 declare type FiltersManagerContextProviderProps = PropsWithChildren<{
     queryClient?: QueryClient;
+    router: NextRouter;
 }>;
-export declare const FiltersManagerContextProvider: ({ queryClient, children }: FiltersManagerContextProviderProps) => React.JSX.Element;
+export declare const FiltersManagerContextProvider: ({ queryClient, children, router }: FiltersManagerContextProviderProps) => React.JSX.Element;
 export {};

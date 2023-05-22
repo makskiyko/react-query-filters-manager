@@ -16,7 +16,6 @@ exports.FiltersManagerContextProvider = exports.useFilters = void 0;
 const react_1 = require("react");
 const react_2 = __importDefault(require("react"));
 const react_query_1 = require("@tanstack/react-query");
-const router_1 = require("next/router");
 const FiltersManagerContext = (0, react_1.createContext)(null);
 /**
  * Using for storing, updating data and saving filters in  URL.
@@ -38,10 +37,9 @@ const FiltersManagerContext = (0, react_1.createContext)(null);
  * 5) When filters are changed, the method for obtaining data is called.
  */
 const useFilters = ({ filtersKey, initialFilters, getVariants, getData, getAppliedFiltersCount, queryParser, queryTransformer, getFiltersValues, setFiltersValues, valuesOptions, }) => {
-    (0, react_1.useContext)(FiltersManagerContext);
+    const router = (0, react_1.useContext)(FiltersManagerContext);
     const queryClient = (0, react_query_1.useQueryClient)();
     const [appliedFiltersCount, setAppliedFiltersCount] = (0, react_1.useState)(0);
-    const router = (0, router_1.useRouter)();
     const variants = (0, react_query_1.useQuery)([...filtersKey, 'variants'], () => __awaiter(void 0, void 0, void 0, function* () {
         return getVariants ? getVariants() : null;
     }));
@@ -92,9 +90,9 @@ const useFilters = ({ filtersKey, initialFilters, getVariants, getData, getAppli
     };
 };
 exports.useFilters = useFilters;
-const FiltersManagerContextProvider = ({ queryClient, children }) => {
+const FiltersManagerContextProvider = ({ queryClient, children, router }) => {
     const client = (0, react_1.useMemo)(() => queryClient !== null && queryClient !== void 0 ? queryClient : new react_query_1.QueryClient(), [queryClient]);
-    return (react_2.default.createElement(FiltersManagerContext.Provider, { value: null },
+    return (react_2.default.createElement(FiltersManagerContext.Provider, { value: router },
         react_2.default.createElement(react_query_1.QueryClientProvider, { client: client }, children)));
 };
 exports.FiltersManagerContextProvider = FiltersManagerContextProvider;

@@ -10,7 +10,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import React from 'react';
 import { QueryClient, QueryClientProvider, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { useRouter } from 'next/router';
 const FiltersManagerContext = createContext(null);
 /**
  * Using for storing, updating data and saving filters in  URL.
@@ -32,10 +31,9 @@ const FiltersManagerContext = createContext(null);
  * 5) When filters are changed, the method for obtaining data is called.
  */
 export const useFilters = ({ filtersKey, initialFilters, getVariants, getData, getAppliedFiltersCount, queryParser, queryTransformer, getFiltersValues, setFiltersValues, valuesOptions, }) => {
-    useContext(FiltersManagerContext);
+    const router = useContext(FiltersManagerContext);
     const queryClient = useQueryClient();
     const [appliedFiltersCount, setAppliedFiltersCount] = useState(0);
-    const router = useRouter();
     const variants = useQuery([...filtersKey, 'variants'], () => __awaiter(void 0, void 0, void 0, function* () {
         return getVariants ? getVariants() : null;
     }));
@@ -85,9 +83,9 @@ export const useFilters = ({ filtersKey, initialFilters, getVariants, getData, g
         resetFilters,
     };
 };
-export const FiltersManagerContextProvider = ({ queryClient, children }) => {
+export const FiltersManagerContextProvider = ({ queryClient, children, router }) => {
     const client = useMemo(() => queryClient !== null && queryClient !== void 0 ? queryClient : new QueryClient(), [queryClient]);
-    return (React.createElement(FiltersManagerContext.Provider, { value: null },
+    return (React.createElement(FiltersManagerContext.Provider, { value: router },
         React.createElement(QueryClientProvider, { client: client }, children)));
 };
 //# sourceMappingURL=filters_manager.js.map

@@ -3,7 +3,7 @@ import React, {type PropsWithChildren} from 'react';
 
 import {QueryClient, QueryClientProvider, useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import type {UseMutationResult, UseQueryOptions, UseQueryResult, QueryKey} from '@tanstack/react-query';
-import {useRouter} from 'next/router';
+import {NextRouter} from 'next/router';
 import {ParsedUrlQuery} from 'querystring';
 
 type Props<TData, TFilters, TFiltersPrepared = TFilters, TVariants = void> = {
@@ -65,7 +65,7 @@ export type UseFiltersState<TData, TFilters, TVariants = void> = {
   resetFilters: UseMutationResult<TFilters, any, void | ResetFilterCallback<TFilters>>;
 };
 
-const FiltersManagerContext = createContext<null>(null);
+const FiltersManagerContext = createContext<NextRouter | null>(null);
 
 /**
  * Using for storing, updating data and saving filters in  URL.
@@ -98,10 +98,9 @@ export const useFilters = <TData extends any, TFilters extends {}, TFiltersPrepa
   setFiltersValues,
   valuesOptions,
 }: Props<TData, TFilters, TFiltersPrepared, TVariants>): UseFiltersState<TData, TFilters, TVariants> => {
-  useContext(FiltersManagerContext);
+  const router = useContext(FiltersManagerContext) as NextRouter;
   const queryClient = useQueryClient();
   const [appliedFiltersCount, setAppliedFiltersCount] = useState<number>(0);
-  const router = useRouter();
 
   const variants = useQuery<TVariants | null, any>([...filtersKey, 'variants'], async () => {
     return getVariants ? getVariants() : null;
@@ -171,13 +170,14 @@ export const useFilters = <TData extends any, TFilters extends {}, TFiltersPrepa
 
 type FiltersManagerContextProviderProps = PropsWithChildren<{
   queryClient?: QueryClient;
+  router: NextRouter;
 }>;
 
-export const FiltersManagerContextProvider = ({queryClient, children}: FiltersManagerContextProviderProps) => {
+export const FiltersManagerContextProvider = ({queryClient, children, router}: FiltersManagerContextProviderProps) => {
   const client = useMemo<QueryClient>(() => queryClient ?? new QueryClient(), [queryClient]);
 
   return (
-    <FiltersManagerContext.Provider value={null}>
+    <FiltersManagerContext.Provider value={router}>
       <QueryClientProvider client={client}>{children}</QueryClientProvider>
     </FiltersManagerContext.Provider>
   );
