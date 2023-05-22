@@ -47,6 +47,7 @@ import {FiltersManagerContextProvider} from 'react-query-filters-manager';
 
 function MyApp({pageProps}: AppProps) {
   const queryClient = useMemo<QueryClient>(() => new QueryClient(), []);
+  const router = useRouter()
   
   return (
     <>
@@ -55,7 +56,7 @@ function MyApp({pageProps}: AppProps) {
       </Head>
 
       <QueryClientProvider client={queryClient}>
-        <FiltersManagerContextProvider queryClient={queryClient}>
+        <FiltersManagerContextProvider queryClient={queryClient} router={router}>
           ...
         </FiltersManagerContextProvider>
       </QueryClientProvider>
