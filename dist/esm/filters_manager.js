@@ -30,7 +30,7 @@ const FiltersManagerContext = createContext(null);
  * 4) To reset the recovery data, `handleChange`, which repeats 2 step with the initial data.
  * 5) When filters are changed, the method for obtaining data is called.
  */
-export const useFilters = ({ filtersKey, initialFilters, getVariants, getData, getAppliedFiltersCount, queryParser, queryTransformer, getFiltersValues, setFiltersValues, valuesOptions, }) => {
+export const useFilters = ({ filtersKey, initialFilters, getVariants, getData, getAppliedFiltersCount, queryParser, queryTransformer, getFiltersValues, setFiltersValues, valuesOptions, querySetter, scrollAfterUpdateQuery, }) => {
     const router = useContext(FiltersManagerContext);
     const queryClient = useQueryClient();
     const [appliedFiltersCount, setAppliedFiltersCount] = useState(0);
@@ -68,10 +68,15 @@ export const useFilters = ({ filtersKey, initialFilters, getVariants, getData, g
         if (!router.isReady || !data)
             return;
         const transformedData = queryTransformer ? queryTransformer(data) : data;
-        router.replace({
-            pathname: router.asPath.replace(/\?.+/, ''),
-            query: transformedData,
-        });
+        if (querySetter) {
+            querySetter(transformedData);
+        }
+        else {
+            router.replace({
+                pathname: router.asPath.replace(/\?.+/, ''),
+                query: transformedData,
+            }, undefined, { scroll: scrollAfterUpdateQuery });
+        }
     };
     return {
         appliedFiltersCount,

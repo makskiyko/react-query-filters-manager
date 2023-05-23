@@ -25,6 +25,9 @@ type Props<TData, TFilters, TFiltersPrepared = TFilters, TVariants = void> = {
   // Update filters.
   setFiltersValues: (data: TFilters) => Promise<TFilters>;
 
+  // Needs to scroll window to top after ser query params.
+  scrollAfterUpdateQuery?: boolean;
+
   // Preparing data for entering it into query params.
   queryTransformer?: (data: TFilters) => TFiltersPrepared;
 
@@ -33,6 +36,9 @@ type Props<TData, TFilters, TFiltersPrepared = TFilters, TVariants = void> = {
 
   // Getting filter options.
   getVariants?: () => Promise<TVariants>;
+
+  // Push filters to query.
+  querySetter?: (query: TFiltersPrepared) => void;
 
   // Options for retrieving data.
   valuesOptions?: Omit<UseQueryOptions<TData, any, TData>, 'queryKey' | 'queryFn' | 'initialData'> & {
@@ -97,6 +103,8 @@ export const useFilters = <TData extends any, TFilters extends {}, TFiltersPrepa
   getFiltersValues,
   setFiltersValues,
   valuesOptions,
+  querySetter,
+  scrollAfterUpdateQuery,
 }: Props<TData, TFilters, TFiltersPrepared, TVariants>): UseFiltersState<TData, TFilters, TVariants> => {
   const router = useContext(FiltersManagerContext) as NextRouter;
   const queryClient = useQueryClient();
@@ -149,12 +157,20 @@ export const useFilters = <TData extends any, TFilters extends {}, TFiltersPrepa
   const handleSetFiltersInUrl = (data: TFilters | undefined) => {
     if (!router.isReady || !data) return;
 
-    const transformedData = queryTransformer ? queryTransformer(data) : data;
+    const transformedData = queryTransformer ? queryTransformer(data) : (data as unknown as TFiltersPrepared);
 
-    router.replace({
-      pathname: router.asPath.replace(/\?.+/, ''),
-      query: transformedData as any,
-    });
+    if (querySetter) {
+      querySetter(transformedData);
+    } else {
+      router.replace(
+        {
+          pathname: router.asPath.replace(/\?.+/, ''),
+          query: transformedData as any,
+        },
+        undefined,
+        {scroll: scrollAfterUpdateQuery},
+      );
+    }
   };
 
   return {

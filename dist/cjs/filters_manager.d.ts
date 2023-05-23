@@ -11,9 +11,11 @@ declare type Props<TData, TFilters, TFiltersPrepared = TFilters, TVariants = voi
     queryParser: (query: ParsedUrlQuery) => TFilters;
     getFiltersValues: () => Promise<TFilters | undefined>;
     setFiltersValues: (data: TFilters) => Promise<TFilters>;
+    scrollAfterUpdateQuery?: boolean;
     queryTransformer?: (data: TFilters) => TFiltersPrepared;
     getAppliedFiltersCount?: (params: TFilters) => number;
     getVariants?: () => Promise<TVariants>;
+    querySetter?: (query: TFiltersPrepared) => void;
     valuesOptions?: Omit<UseQueryOptions<TData, any, TData>, 'queryKey' | 'queryFn' | 'initialData'> & {
         initialData?: () => undefined;
     };
@@ -47,7 +49,7 @@ export declare type UseFiltersState<TData, TFilters, TVariants = void> = {
  * 4) To reset the recovery data, `handleChange`, which repeats 2 step with the initial data.
  * 5) When filters are changed, the method for obtaining data is called.
  */
-export declare const useFilters: <TData extends unknown, TFilters extends {}, TFiltersPrepared = TFilters, TVariants = void>({ filtersKey, initialFilters, getVariants, getData, getAppliedFiltersCount, queryParser, queryTransformer, getFiltersValues, setFiltersValues, valuesOptions, }: Props<TData, TFilters, TFiltersPrepared, TVariants>) => UseFiltersState<TData, TFilters, TVariants>;
+export declare const useFilters: <TData extends unknown, TFilters extends {}, TFiltersPrepared = TFilters, TVariants = void>({ filtersKey, initialFilters, getVariants, getData, getAppliedFiltersCount, queryParser, queryTransformer, getFiltersValues, setFiltersValues, valuesOptions, querySetter, scrollAfterUpdateQuery, }: Props<TData, TFilters, TFiltersPrepared, TVariants>) => UseFiltersState<TData, TFilters, TVariants>;
 declare type FiltersManagerContextProviderProps = PropsWithChildren<{
     queryClient?: QueryClient;
     router: NextRouter;

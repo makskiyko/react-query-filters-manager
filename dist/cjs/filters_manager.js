@@ -36,7 +36,7 @@ const FiltersManagerContext = (0, react_1.createContext)(null);
  * 4) To reset the recovery data, `handleChange`, which repeats 2 step with the initial data.
  * 5) When filters are changed, the method for obtaining data is called.
  */
-const useFilters = ({ filtersKey, initialFilters, getVariants, getData, getAppliedFiltersCount, queryParser, queryTransformer, getFiltersValues, setFiltersValues, valuesOptions, }) => {
+const useFilters = ({ filtersKey, initialFilters, getVariants, getData, getAppliedFiltersCount, queryParser, queryTransformer, getFiltersValues, setFiltersValues, valuesOptions, querySetter, scrollAfterUpdateQuery, }) => {
     const router = (0, react_1.useContext)(FiltersManagerContext);
     const queryClient = (0, react_query_1.useQueryClient)();
     const [appliedFiltersCount, setAppliedFiltersCount] = (0, react_1.useState)(0);
@@ -74,10 +74,15 @@ const useFilters = ({ filtersKey, initialFilters, getVariants, getData, getAppli
         if (!router.isReady || !data)
             return;
         const transformedData = queryTransformer ? queryTransformer(data) : data;
-        router.replace({
-            pathname: router.asPath.replace(/\?.+/, ''),
-            query: transformedData,
-        });
+        if (querySetter) {
+            querySetter(transformedData);
+        }
+        else {
+            router.replace({
+                pathname: router.asPath.replace(/\?.+/, ''),
+                query: transformedData,
+            }, undefined, { scroll: scrollAfterUpdateQuery });
+        }
     };
     return {
         appliedFiltersCount,
